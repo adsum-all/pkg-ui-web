@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnp.*
+.yarn/*
+
+# Build output
+dist/
+build/
+.vite/
+.turbo/
+out/
+
+# Native (Capacitor)
+android/app/build/
+ios/App/build/
+.gradle/
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# Test and cache
+coverage/
+.nyc_output/
+*.tsbuildinfo
+
+# Logs and OS
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
