@@ -1,0 +1,42 @@
+{
+  "name": "@adsum/ui-web",
+  "version": "0.1.0",
+  "description": "ADSUM shared web components. Today: the help centre shell, whose content always comes from the server.",
+  "license": "UNLICENSED",
+  "private": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./aide.css": "./dist/aide.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json && node scripts/emit-css.mjs"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.5",
+    "react": "^18.3.1",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.1"
+  },
+  "publishConfig": {
+    "@adsum:registry": "https://gitlab.com/api/v4/projects/83849937/packages/npm/"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

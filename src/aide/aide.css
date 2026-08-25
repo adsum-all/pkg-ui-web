@@ -1,0 +1,372 @@
+/*
+ * La mise en forme du centre d'aide.
+ *
+ * Toutes les couleurs, tous les espacements et toutes les fontes viennent de
+ * @adsum/tokens. Aucune valeur n'est inventée ici : c'est ce qui fait que l'aide
+ * ressemble à l'application qui l'héberge, dans les dix cas, et qu'elle suit le
+ * thème sombre sans une ligne de plus, puisque les jetons le portent déjà.
+ *
+ * Chaque variable a un repli. Une application qui n'aurait pas encore installé les
+ * jetons afficherait une aide sobre plutôt qu'une page noire sur noir.
+ */
+
+.aide-hors-ecran {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------ bouton */
+
+.aide-bouton {
+  font-family: var(--adsum-font-ui, system-ui, sans-serif);
+  font-size: var(--adsum-text-sm, 13px);
+  color: var(--adsum-acc, #2a4fad);
+  background: transparent;
+  border: 1px solid var(--adsum-line, #e3e5ea);
+  border-radius: var(--adsum-radius-pill, 999px);
+  padding: var(--adsum-space-1, 4px) var(--adsum-space-3, 12px);
+  cursor: pointer;
+}
+
+.aide-bouton:hover {
+  background: var(--adsum-info-bg, #eef3fc);
+}
+
+.aide-bouton:focus-visible,
+.aide-tiroir button:focus-visible,
+.aide-page button:focus-visible,
+.aide-tiroir input:focus-visible,
+.aide-page input:focus-visible {
+  outline: 2px solid var(--adsum-acc, #2a4fad);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ tiroir */
+
+.aide-voile {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 18, 24, 0.35);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+}
+
+.aide-tiroir {
+  display: flex;
+  flex-direction: column;
+  gap: var(--adsum-space-3, 12px);
+  width: min(420px, 100vw);
+  height: 100%;
+  padding: var(--adsum-space-4, 16px);
+  background: var(--adsum-panel, #ffffff);
+  color: var(--adsum-ink, #16181d);
+  font-family: var(--adsum-font-ui, system-ui, sans-serif);
+  font-size: var(--adsum-text-base, 15px);
+  box-shadow: var(--adsum-shadow-lg, 0 18px 40px rgba(16, 18, 24, 0.22));
+  overflow: hidden;
+}
+
+.aide-tiroir__entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.aide-tiroir__entete h2 {
+  margin: 0;
+  font-family: var(--adsum-font-display, system-ui, sans-serif);
+  font-size: var(--adsum-text-xl, 22px);
+}
+
+.aide-fermer,
+.aide-retour {
+  background: transparent;
+  border: 0;
+  color: var(--adsum-mut, #676b73);
+  font-size: var(--adsum-text-sm, 13px);
+  cursor: pointer;
+  padding: var(--adsum-space-1, 4px);
+}
+
+.aide-tiroir__corps {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.aide-tiroir__pied {
+  display: flex;
+  gap: var(--adsum-space-2, 8px);
+  border-top: 1px solid var(--adsum-line, #e3e5ea);
+  padding-top: var(--adsum-space-3, 12px);
+}
+
+.aide-tiroir__pied button {
+  flex: 1;
+  padding: var(--adsum-space-2, 8px);
+  font-size: var(--adsum-text-sm, 13px);
+  color: var(--adsum-ink2, #3d4047);
+  background: var(--adsum-board, #e8eaee);
+  border: 0;
+  border-radius: var(--adsum-radius-sm, 8px);
+  cursor: pointer;
+}
+
+.aide-tiroir__pied button.actif {
+  background: var(--adsum-acc, #2a4fad);
+  color: var(--adsum-panel, #ffffff);
+}
+
+/* --------------------------------------------------------------- recherche */
+
+.aide-recherche input {
+  width: 100%;
+  padding: var(--adsum-space-2, 8px) var(--adsum-space-3, 12px);
+  font: inherit;
+  color: var(--adsum-ink, #16181d);
+  background: var(--adsum-bg, #f4f5f7);
+  border: 1px solid var(--adsum-line, #e3e5ea);
+  border-radius: var(--adsum-radius-sm, 8px);
+}
+
+/* ------------------------------------------------------------------- liste */
+
+.aide-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--adsum-space-1, 4px);
+}
+
+.aide-liste button {
+  display: flex;
+  flex-direction: column;
+  gap: var(--adsum-space-1, 4px);
+  width: 100%;
+  text-align: left;
+  padding: var(--adsum-space-3, 12px);
+  background: transparent;
+  border: 0;
+  border-radius: var(--adsum-radius-sm, 8px);
+  cursor: pointer;
+  color: inherit;
+}
+
+.aide-liste button:hover {
+  background: var(--adsum-board, #e8eaee);
+}
+
+.aide-liste__titre {
+  font-weight: 600;
+}
+
+.aide-liste__extrait {
+  color: var(--adsum-mut, #676b73);
+  font-size: var(--adsum-text-sm, 13px);
+}
+
+/* ----------------------------------------------------------------- article */
+
+.aide-article h2,
+.aide-article h3 {
+  font-family: var(--adsum-font-display, system-ui, sans-serif);
+  margin: var(--adsum-space-3, 12px) 0;
+  text-wrap: balance;
+}
+
+.aide-corps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--adsum-space-3, 12px);
+  /* Une ligne de lecture bornée. Au-delà, l'oeil perd le début de la ligne
+     suivante, ce qui compte sur un texte qu'on lit en cherchant une réponse. */
+  max-width: 68ch;
+}
+
+.aide-paragraphe {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.aide-etapes,
+.aide-points {
+  margin: 0;
+  padding-left: var(--adsum-space-5, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--adsum-space-2, 8px);
+  line-height: 1.6;
+}
+
+.aide-avertissement {
+  margin: 0;
+  padding: var(--adsum-space-3, 12px);
+  background: var(--adsum-danger-bg, #fae9e7);
+  color: var(--adsum-danger, #c0392b);
+  border-radius: var(--adsum-radius-sm, 8px);
+  line-height: 1.5;
+}
+
+.aide-formule {
+  margin: 0;
+  padding: var(--adsum-space-3, 12px);
+  font-family: var(--adsum-font-mono, ui-monospace, monospace);
+  font-size: var(--adsum-text-sm, 13px);
+  background: var(--adsum-board, #e8eaee);
+  border-radius: var(--adsum-radius-sm, 8px);
+  /* Une formule longue défile dans son cadre. Sans cela, c'est la page entière
+     qui se met à défiler de côté. */
+  overflow-x: auto;
+}
+
+.aide-lien-ecran {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--adsum-acc, #2a4fad);
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* -------------------------------------------------------------------- avis */
+
+.aide-avis {
+  display: flex;
+  align-items: center;
+  gap: var(--adsum-space-2, 8px);
+  margin-top: var(--adsum-space-4, 16px);
+  padding-top: var(--adsum-space-3, 12px);
+  border-top: 1px solid var(--adsum-line, #e3e5ea);
+  font-size: var(--adsum-text-sm, 13px);
+  color: var(--adsum-mut, #676b73);
+}
+
+.aide-avis button {
+  padding: var(--adsum-space-1, 4px) var(--adsum-space-3, 12px);
+  background: var(--adsum-board, #e8eaee);
+  border: 0;
+  border-radius: var(--adsum-radius-pill, 999px);
+  cursor: pointer;
+  color: var(--adsum-ink2, #3d4047);
+}
+
+.aide-merci,
+.aide-attente,
+.aide-vide {
+  color: var(--adsum-mut, #676b73);
+  font-size: var(--adsum-text-sm, 13px);
+}
+
+.aide-erreur {
+  padding: var(--adsum-space-3, 12px);
+  background: var(--adsum-danger-bg, #fae9e7);
+  color: var(--adsum-danger, #c0392b);
+  border-radius: var(--adsum-radius-sm, 8px);
+}
+
+.aide-rien {
+  display: flex;
+  flex-direction: column;
+  gap: var(--adsum-space-3, 12px);
+  align-items: flex-start;
+  padding: var(--adsum-space-4, 16px) 0;
+  color: var(--adsum-mut, #676b73);
+}
+
+.aide-escalade {
+  padding: var(--adsum-space-2, 8px) var(--adsum-space-4, 16px);
+  background: var(--adsum-acc, #2a4fad);
+  color: var(--adsum-panel, #ffffff);
+  border: 0;
+  border-radius: var(--adsum-radius-sm, 8px);
+  cursor: pointer;
+  font: inherit;
+}
+
+/* -------------------------------------------------------------- page pleine */
+
+.aide-page {
+  font-family: var(--adsum-font-ui, system-ui, sans-serif);
+  font-size: var(--adsum-text-base, 15px);
+  color: var(--adsum-ink, #16181d);
+  padding: var(--adsum-space-6, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--adsum-space-5, 20px);
+}
+
+.aide-page__entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--adsum-space-4, 16px);
+}
+
+.aide-page__entete h1 {
+  margin: 0;
+  font-family: var(--adsum-font-display, system-ui, sans-serif);
+  font-size: var(--adsum-text-2xl, 28px);
+}
+
+.aide-page__entete .aide-recherche {
+  flex: 1;
+  min-width: 240px;
+  max-width: 420px;
+}
+
+.aide-page__corps {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) 1fr;
+  gap: var(--adsum-space-6, 24px);
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .aide-page__corps {
+    grid-template-columns: 1fr;
+  }
+}
+
+.aide-page__rubriques {
+  display: flex;
+  flex-direction: column;
+  gap: var(--adsum-space-1, 4px);
+}
+
+.aide-page__rubriques button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--adsum-space-2, 8px);
+  padding: var(--adsum-space-2, 8px) var(--adsum-space-3, 12px);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: var(--adsum-radius-sm, 8px);
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.aide-page__rubriques button.actif {
+  background: var(--adsum-info-bg, #eef3fc);
+  color: var(--adsum-acc, #2a4fad);
+  font-weight: 600;
+}
+
+.aide-page__compte {
+  font-size: var(--adsum-text-xs, 12px);
+  color: var(--adsum-mut, #676b73);
+  font-variant-numeric: tabular-nums;
+}
