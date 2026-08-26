@@ -59,6 +59,24 @@ export interface Usage {
   readonly commentaire?: string;
 }
 
+/**
+ * Un rangement local, fourni par l'application qui en a besoin.
+ *
+ * Une seule en a besoin aujourd'hui, et c'est la plus exposée : le contrôleur
+ * n'enregistre aucun service worker, si bien qu'une aide chargée par le réseau
+ * serait absente exactement quand elle sert, devant une file, sans couverture.
+ *
+ * La responsabilité de vider ce rangement appartient à l'application, et elle est
+ * réelle : le corpus mis en cache a été filtré selon les droits de la personne qui
+ * l'a chargé. Le resservir à quelqu'un d'autre lui montrerait des articles qu'elle
+ * n'a pas le droit de lire. Le contrôleur efface déjà son annuaire à la
+ * déconnexion, pour la même raison et par le même geste.
+ */
+export interface RangementAide {
+  lire(cle: string): unknown;
+  ecrire(cle: string, valeur: unknown): void;
+}
+
 export interface ConfigurationAide {
   /** La racine de l'API, sans barre finale. */
   readonly api: string;
@@ -67,6 +85,8 @@ export interface ConfigurationAide {
   /** Rend le jeton courant, ou une chaîne vide. Appelé à chaque requête. */
   readonly jeton?: () => string;
   readonly langue?: string;
+  /** Absent, le client ne sert que ce que le réseau rend. */
+  readonly rangement?: RangementAide;
 }
 
 export class ErreurAide extends Error {
@@ -93,13 +113,32 @@ export class ClientAide {
     }
 
     const jeton = this.config.jeton?.() ?? "";
-    const reponse = await fetch(url.toString(), {
-      headers: jeton === "" ? {} : { Authorization: `Bearer ${jeton}` },
-    });
+    const cle = url.pathname + url.search;
+
+    let reponse: Response;
+    try {
+      reponse = await fetch(url.toString(), {
+        headers: jeton === "" ? {} : { Authorization: `Bearer ${jeton}` },
+      });
+    } catch (echec) {
+      // Réseau absent. C'est le seul cas où le rangement local répond, et c'est
+      // celui pour lequel il existe.
+      const garde = this.config.rangement?.lire(cle);
+      if (garde !== undefined && garde !== null) return garde as T;
+      throw new ErreurAide(
+        "L'aide n'est pas disponible hors connexion sur cet appareil.",
+        0,
+      );
+    }
+
     if (!reponse.ok) {
       // Le message reste général : l'API répond la même chose pour un article
       // absent et pour un article qu'on n'a pas le droit de lire, et distinguer
       // les deux ici annulerait cette précaution.
+      //
+      // Le rangement local n'est PAS consulté ici. Un refus est une réponse du
+      // serveur, pas une panne : servir une version gardée après un 403 rendrait
+      // lisible un article dont on vient de perdre le droit.
       throw new ErreurAide(
         reponse.status === 404
           ? "Cette page d'aide n'existe pas ou ne vous est pas accessible."
@@ -107,7 +146,14 @@ export class ClientAide {
         reponse.status,
       );
     }
-    return (await reponse.json()) as T;
+
+    const charge = (await reponse.json()) as T;
+    try {
+      this.config.rangement?.ecrire(cle, charge);
+    } catch {
+      /* Rangement plein ou refusé. La lecture en cours reste servie. */
+    }
+    return charge;
   }
 
   rubriques(): Promise<Rubrique[]> {

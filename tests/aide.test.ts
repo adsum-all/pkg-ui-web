@@ -153,3 +153,79 @@ describe("le client d'aide", () => {
     expect(corps.cle_ecran).toBe("controleur.scan");
   });
 });
+
+describe("le rangement local", () => {
+  const config = { api: "https://api.exemple.org", application: "controleur" };
+
+  function rangement() {
+    const contenu = new Map<string, unknown>();
+    return {
+      contenu,
+      lire: (cle: string) => contenu.get(cle) ?? null,
+      ecrire: (cle: string, valeur: unknown) => {
+        contenu.set(cle, valeur);
+      },
+    };
+  }
+
+  it("garde ce que le réseau a rendu", async () => {
+    poserReseau([{ cle: "a", titre: "Un article" }]);
+    const local = rangement();
+    await new ClientAide({ ...config, rangement: local }).articles();
+    expect(local.contenu.size).toBe(1);
+  });
+
+  it("sert la version gardée quand le réseau est absent", async () => {
+    // Le seul cas où le rangement répond, et celui pour lequel il existe : un
+    // contrôleur devant une file, sans couverture.
+    const local = rangement();
+    poserReseau([{ cle: "a", titre: "Un article" }]);
+    const client = new ClientAide({ ...config, rangement: local });
+    await client.articles();
+
+    vi.stubGlobal("fetch", () => Promise.reject(new Error("réseau coupé")));
+    const horsLigne = await client.articles();
+    expect(horsLigne).toEqual([{ cle: "a", titre: "Un article" }]);
+  });
+
+  it("ne sert rien hors ligne quand rien n a été gardé", async () => {
+    vi.stubGlobal("fetch", () => Promise.reject(new Error("réseau coupé")));
+    await expect(
+      new ClientAide({ ...config, rangement: rangement() }).articles(),
+    ).rejects.toThrow(/hors connexion/);
+  });
+
+  it("ne sert JAMAIS la version gardée après un refus du serveur", async () => {
+    // Un refus est une réponse, pas une panne. Servir une version gardée après un
+    // 403 rendrait lisible un article dont la personne vient de perdre le droit.
+    const local = rangement();
+    poserReseau([{ cle: "secret", titre: "Réservé" }]);
+    const client = new ClientAide({ ...config, rangement: local });
+    await client.articles();
+
+    poserReseau({}, 403);
+    await expect(client.articles()).rejects.toBeInstanceOf(ErreurAide);
+  });
+
+  it("sert la lecture même si le rangement refuse d écrire", async () => {
+    poserReseau([{ cle: "a" }]);
+    const plein = {
+      lire: () => null,
+      ecrire: () => {
+        throw new Error("quota dépassé");
+      },
+    };
+    await expect(
+      new ClientAide({ ...config, rangement: plein }).articles(),
+    ).resolves.toEqual([{ cle: "a" }]);
+  });
+
+  it("distingue deux écrans dans le rangement", async () => {
+    const local = rangement();
+    poserReseau([]);
+    const client = new ClientAide({ ...config, rangement: local });
+    await client.parEcran("controleur.scan");
+    await client.parEcran("controleur.queue");
+    expect(local.contenu.size).toBe(2);
+  });
+});

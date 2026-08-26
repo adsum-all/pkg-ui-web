@@ -11,6 +11,7 @@ export type {
   ArticleResume,
   Bloc,
   ConfigurationAide,
+  RangementAide,
   Rubrique,
   TypeUsage,
   Usage,
